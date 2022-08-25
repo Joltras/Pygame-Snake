@@ -1,10 +1,12 @@
 import pygame
-from Snake import Snake
+from actor.Snake import Snake
 import Message
 from Enums import Direction, Color, GameState
 from Message import MessageDisplayer
 from Game_Field import GameField
 from Button import Button
+from commands.Command import Command
+from commands.Move_Commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
 
 BUTTON_WIDTH = 100
 BUTTON_HEIGHT = 30
@@ -36,6 +38,11 @@ class Game:
         self.__exit_Button = Button(BUTTON_WIDTH, BUTTON_HEIGHT, "Exit", self.set_closing, Color.ORANGE)
         self.__restart_Button = Button(BUTTON_WIDTH, BUTTON_HEIGHT, "Restart", self.set_starting)
         self.__continue_Button = Button(BUTTON_WIDTH, BUTTON_HEIGHT, "Continue", self.set_running)
+
+        self.move_up = MoveUpCommand()
+        self.move_down = MoveDownCommand()
+        self.move_left = MoveLeftCommand()
+        self.move_right = MoveRightCommand()
 
     def set_running(self):
         self.__game_state = GameState.RUNNING
@@ -170,3 +177,23 @@ class Game:
             changed_direction = True
 
         return changed_direction
+
+    def handle_input(self, event)-> Command:
+        command: Command = None
+
+        if event.key == pygame.K_DOWN:
+            self.__snake.change_direction(Direction.DOWN)
+            command = self.move_down
+        elif event.key == pygame.K_UP:
+            self.__snake.change_direction(Direction.UP)
+            command = self.move_up
+        elif event.key == pygame.K_RIGHT:
+            self.__snake.change_direction(Direction.RIGHT)
+            command = self.move_right
+        elif event.key == pygame.K_LEFT:
+            self.__snake.change_direction(Direction.LEFT)
+            command = self.move_left
+
+        return command
+
+
