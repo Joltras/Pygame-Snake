@@ -1,18 +1,19 @@
 import random
 from Game_Field import GameField
-
+from Globals import SQUARE_SIZE
 from pygame import Rect
 
 
 class Food:
 
-    def __init__(self, field: GameField):
+    def __init__(self, x: int, y: int):
         """
         Creates a new food object.
         A food object is a rectangle which can be randomly placed on a field.
-        :param field: Object of the game field
+        :param x:
+        :param y:
         """
-        self.__rect = Rect(0, 0, field.get_square_size(), field.get_square_size())
+        self.__rect = Rect(x, y, SQUARE_SIZE, SQUARE_SIZE)
 
     def get_rect(self):
         """
@@ -21,14 +22,10 @@ class Food:
         """
         return self.__rect
 
-    def place(self, field: GameField):
+    def place(self, x: int, y: int):
         """
         Places the food-object on a random location on a field.
-        :param field: Field object
+        :param x:
+        :param y:
         """
-        size: int = field.get_square_size()
-
-        left = random.randint(1, (field.get_width_in_squares() - 2))
-        top = random.randint(1,  (field.get_height_in_squares() - 2))
-        self.__rect = Rect(left * size, top * size, size, size)
-
+        self.__rect = Rect(x, y, SQUARE_SIZE, SQUARE_SIZE)
