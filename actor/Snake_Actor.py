@@ -19,16 +19,18 @@ class Snake(Actor):
     def get_length(self):
         return len(self.__segments)
 
-    def collides_with_rectangle(self, rect: Rect) -> bool:
+    def collides_with_body(self, rect: Rect) -> bool:
         """
         Checks if the segments of the snake collide with a given rectangle.
         :param rect: Rectangle to check collision
         :return: True when they collide otherwise False
         """
-        if rect.collidelist(self.__segments) != -1:
+        if rect.colliderect(self.__segments[0]):
             return False
-        else:
+        if rect.collidelist(self.__segments) != -1:
             return True
+        else:
+            return False
 
     def __add_and_remove_last(self, new_head):
         self.__segments.appendleft(new_head)
