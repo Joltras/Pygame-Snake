@@ -1,37 +1,41 @@
 import pygame
-from actor.Snake import Snake
+
+from Food import Food
+from actor.Snake_Actor import Snake
 import Message
-from Enums import Direction, Color, GameState
+from Globals import Color, GameState, SQUARE_SIZE, BUTTON_WIDTH, BUTTON_HEIGHT
 from Message import MessageDisplayer
 from Game_Field import GameField
 from Button import Button
 from commands.Command import Command
+from commands.Grow import GrowCommand
 from commands.Move_Commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
 
-BUTTON_WIDTH = 100
-BUTTON_HEIGHT = 30
-NUMBER_OF_SQUARES = 50
-SQUARE_SIZE = 20
 
 class Game:
+    grow: GrowCommand
+
     def __init__(self, width: int, height: int):
         """
         Creates a new Game with the given data.
-        :param width_in_squares: Numbers of squares that can fit in a row of the game field.
-        :param height_in_squares: Numbers of squares that can fit in a column of the field
-        :param square_size: Size of one field
+        :param width: width of the game window
+        :param height: height of the game window
         """
+
         placed_food: bool
         width_in_squares: int = width // SQUARE_SIZE
         height_in_squares: int = height // SQUARE_SIZE
 
-        self.__field: GameField = GameField(width_in_squares, height_in_squares, SQUARE_SIZE)
-        self.__snake: Snake = Snake(self.__field)
+        self.__field: GameField = GameField(width_in_squares, height_in_squares)
+
+        self.__actor: Snake = Snake(self.__field.random_coordinate_on_field(), self.__field.random_coordinate_on_field())
         self.__screen = pygame.display.set_mode((width, height))
         self.__clock = pygame.time.Clock()
 
         self.__message_displayer: MessageDisplayer = MessageDisplayer(self.__field.get_width(),
                                                                       self.__field.get_height())
+        self.__food: Food = None
+        self.set_food()
 
         self.__game_state: GameState = GameState.STARTING
         self.__start_Button = Button(BUTTON_WIDTH, BUTTON_HEIGHT, "Start", self.set_running)
@@ -43,6 +47,7 @@ class Game:
         self.move_down = MoveDownCommand()
         self.move_left = MoveLeftCommand()
         self.move_right = MoveRightCommand()
+        self.grow = GrowCommand()
 
     def set_running(self):
         self.__game_state = GameState.RUNNING
@@ -52,6 +57,15 @@ class Game:
 
     def set_starting(self):
         self.__game_state = GameState.STARTING
+
+    def set_food(self):
+        placed_food = False
+        while not placed_food:
+            x = self.__field.random_coordinate_on_field()
+            y = self.__field.random_coordinate_on_field()
+            self.__food = Food(x, y)
+            if not self.__actor.collides_with_rectangle(self.__food.get_rect()):
+                placed_food = True
 
     def draw(self):
         """
@@ -63,12 +77,12 @@ class Game:
             pygame.draw.rect(self.__screen, Color.LIGHT_GRAY.value, rect)
             pygame.draw.rect(self.__screen, Color.GRAY.value, rect, 2, 1)
 
-        for rect in self.__snake.get_segments():
+        for rect in self.__actor.get_segments():
             pygame.draw.rect(self.__screen, Color.GREEN.value, rect)
             pygame.draw.rect(self.__screen, Color.DARK_GREEN.value, rect, 2, 1)
 
-        pygame.draw.rect(self.__screen, Color.BLACK.value, self.__snake.get_food().get_rect())
-        pygame.draw.rect(self.__screen, Color.DARK_GRAY.value, self.__snake.get_food().get_rect(), 2, 1)
+        pygame.draw.rect(self.__screen, Color.BLACK.value, self.__food.get_rect())
+        pygame.draw.rect(self.__screen, Color.DARK_GRAY.value, self.__food.get_rect(), 2, 1)
 
     def run(self):
         """
@@ -76,14 +90,16 @@ class Game:
         """
         active: bool
         first_input = True
+        command: Command = None
 
         active = True
         while active:
 
             if self.__game_state.value == 0:
                 # Starting
-                self.__message_displayer.create_message(self.__field, Message.START_TITLE,  self.__screen,  self.__start_Button,
-                                                       self.__exit_Button)
+                self.__message_displayer.create_message(self.__field, Message.START_TITLE, self.__screen,
+                                                        self.__start_Button,
+                                                        self.__exit_Button)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.__game_state = GameState.CLOSE_GAME
@@ -97,6 +113,7 @@ class Game:
 
             elif self.__game_state.value == 1:
                 # Running
+
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         active = False
@@ -104,10 +121,15 @@ class Game:
                         if event.key == pygame.K_ESCAPE:
                             self.__game_state = GameState.PAUSED
                             break
-                        first_input = not self.check_movement(event)
-                if not first_input:
-                    if not self.__snake.move(self.__field):
-                        self.__game_state = GameState.GAME_OVER
+                        command = self.handle_input(event)
+                    if command is not None:
+                        command.execute(self.__actor)
+                        if self.__field.collides_with_boarder(self.__actor.get_segments()):
+                            self.__game_state = GameState.GAME_OVER
+                        elif self.__actor.collides_with_rectangle(self.__food.get_rect()):
+                            self.grow.execute(self.__actor)
+                        if first_input:
+                            first_input = False
                 self.draw()
 
             elif self.__game_state.value == 2:
@@ -116,14 +138,15 @@ class Game:
 
             elif self.__game_state.value == 3:
                 # Losing
-                self.__message_displayer.create_message(self.__field,Message.GAME_OVER_TITLE, self.__screen, self.__restart_Button,
-                                                           self.__exit_Button)
+                self.__message_displayer.create_message(self.__field, Message.GAME_OVER_TITLE, self.__screen,
+                                                        self.__restart_Button,
+                                                        self.__exit_Button)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.__game_state = GameState.CLOSE_GAME
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_y:
-                            self.__snake = Snake(self.__field)
+                            self.__actor = Snake(self.__field)
                             first_input = True
                             self.__game_state = GameState.STARTING
                         elif event.key == pygame.K_n:
@@ -132,7 +155,7 @@ class Game:
                         self.__exit_Button.has_been_clicked(event.pos[0], event.pos[1])
                         self.__restart_Button.has_been_clicked(event.pos[0], event.pos[1])
                         if self.__game_state.value == 0:
-                            self.__snake = Snake(self.__field)
+                            self.__actor = Snake(self.__field)
                             first_input = True
 
             elif self.__game_state.value == 4:
@@ -140,7 +163,8 @@ class Game:
                 active = False
             elif self.__game_state.value == 5:
                 # Pausing
-                self.__message_displayer.create_message(self.__field, Message.PAUSED_TITLE, self.__screen, self.__continue_Button, self.__exit_Button)
+                self.__message_displayer.create_message(self.__field, Message.PAUSED_TITLE, self.__screen,
+                                                        self.__continue_Button, self.__exit_Button)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.__game_state = GameState.CLOSE_GAME
@@ -154,46 +178,15 @@ class Game:
             pygame.display.flip()
             self.__clock.tick(5)
 
-
-    def check_movement(self, event) -> bool:
-        """
-        Change the direction when a arrow key was pressed.
-        :param event: Event
-        :return: True when the direction changed otherwise False
-        """
-        changed_direction: bool = False
-
-        if event.key == pygame.K_DOWN:
-            self.__snake.change_direction(Direction.DOWN)
-            changed_direction = True
-        elif event.key == pygame.K_UP:
-            self.__snake.change_direction(Direction.UP)
-            changed_direction = True
-        elif event.key == pygame.K_RIGHT:
-            self.__snake.change_direction(Direction.RIGHT)
-            changed_direction = True
-        elif event.key == pygame.K_LEFT:
-            self.__snake.change_direction(Direction.LEFT)
-            changed_direction = True
-
-        return changed_direction
-
-    def handle_input(self, event)-> Command:
+    def handle_input(self, event) -> Command:
         command: Command = None
-
         if event.key == pygame.K_DOWN:
-            self.__snake.change_direction(Direction.DOWN)
             command = self.move_down
         elif event.key == pygame.K_UP:
-            self.__snake.change_direction(Direction.UP)
             command = self.move_up
         elif event.key == pygame.K_RIGHT:
-            self.__snake.change_direction(Direction.RIGHT)
             command = self.move_right
         elif event.key == pygame.K_LEFT:
-            self.__snake.change_direction(Direction.LEFT)
             command = self.move_left
 
         return command
-
-
