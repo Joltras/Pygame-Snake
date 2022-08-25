@@ -20,5 +20,5 @@ class Actor(ABC):
 
 
     @abstractmethod
-    def eat(self):
+    def grow(self):
         pass
