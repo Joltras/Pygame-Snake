@@ -1,6 +1,6 @@
 import pygame.draw
 from pygame import Rect, font
-from Enums import Color
+from Globals import Color
 
 TEXT_COLOR: Color = Color.BLACK
 FONT_SIZE = 25
@@ -41,7 +41,7 @@ class Button:
         rendered_font = self.__font.render(self.__text, True, TEXT_COLOR.value)
         screen.blit(rendered_font, (text_x, text_y))
 
-    def has_been_clicked(self, x: int, y: int) -> bool:
+    def has_been_clicked(self, x: int, y: int) -> None:
         """
         Checks if the button has been clicked.
         :param x: x-coordinate of the click
@@ -51,14 +51,14 @@ class Button:
         if self.__rect.collidepoint(x, y):
             self.__on_click()
 
-    def get_width(self):
+    def get_width(self) -> int:
         """
         Returns the width of the button.
         :return: The width of the button
         """
         return self.__width
 
-    def get_height(self):
+    def get_height(self) -> int:
         """
         Returns the height of the button.
         :return: Height of the button
