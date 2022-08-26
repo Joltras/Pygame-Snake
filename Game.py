@@ -28,7 +28,7 @@ class Game:
 
         self.__field: GameField = GameField(width_in_squares, height_in_squares)
 
-        self.__actor: Snake = Snake(self.__field.random_coordinate_on_field(), self.__field.random_coordinate_on_field())
+        self.__actor: Snake = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field())
         self.__screen = pygame.display.set_mode((width, height))
         self.__clock = pygame.time.Clock()
 
@@ -61,10 +61,10 @@ class Game:
     def set_food(self):
         placed_food = False
         while not placed_food:
-            x = self.__field.random_coordinate_on_field()
-            y = self.__field.random_coordinate_on_field()
+            x = self.__field.random_x_on_field()
+            y = self.__field.random_y_on_field()
             self.__food = Food(x, y)
-            if not self.__actor.collides_with_rectangle(self.__food.get_rect()):
+            if not self.__actor.collides_with_body(self.__food.get_rect()):
                 placed_food = True
 
     def draw(self):
@@ -89,7 +89,6 @@ class Game:
         Reacts to the input.
         """
         active: bool
-        first_input = True
         command: Command = None
 
         active = True
@@ -121,15 +120,18 @@ class Game:
                         if event.key == pygame.K_ESCAPE:
                             self.__game_state = GameState.PAUSED
                             break
-                        command = self.handle_input(event)
-                    if command is not None:
-                        command.execute(self.__actor)
-                        if self.__field.collides_with_boarder(self.__actor.get_segments()):
-                            self.__game_state = GameState.GAME_OVER
-                        elif self.__actor.collides_with_rectangle(self.__food.get_rect()):
-                            self.grow.execute(self.__actor)
-                        if first_input:
-                            first_input = False
+                        n_command = self.handle_input(event)
+                        if n_command is not None:
+                            command = n_command
+                if command is not None:
+                    command.execute(self.__actor)
+                    if self.__field.collides_with_boarder(self.__actor.get_segments()):
+                        self.__game_state = GameState.GAME_OVER
+                    elif self.__actor.collides_with_itself():
+                        self.__game_state = GameState.GAME_OVER
+                    elif self.__actor.collides_with_head(self.__food.get_rect()):
+                        self.set_food()
+                        self.grow.execute(self.__actor)
                 self.draw()
 
             elif self.__game_state.value == 2:
@@ -146,8 +148,7 @@ class Game:
                         self.__game_state = GameState.CLOSE_GAME
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_y:
-                            self.__actor = Snake(self.__field)
-                            first_input = True
+                            self.__actor = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field())
                             self.__game_state = GameState.STARTING
                         elif event.key == pygame.K_n:
                             self.__game_state = GameState.CLOSE_GAME
@@ -155,8 +156,7 @@ class Game:
                         self.__exit_Button.has_been_clicked(event.pos[0], event.pos[1])
                         self.__restart_Button.has_been_clicked(event.pos[0], event.pos[1])
                         if self.__game_state.value == 0:
-                            self.__actor = Snake(self.__field)
-                            first_input = True
+                            self.__actor = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field())
 
             elif self.__game_state.value == 4:
                 # Closing

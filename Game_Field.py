@@ -11,7 +11,6 @@ class GameField:
         Creates a new GameField with the given data.
         :param width_in_squares: numbers of squares that fit a row of the field
         :param height_in_squares: number of squares that fit in a column of the field
-        :param square_size: size of one square
         """
         self.__width_in_squares = width_in_squares
         self.__width = width_in_squares * SQUARE_SIZE
@@ -71,11 +70,14 @@ class GameField:
 
     def collides_with_boarder(self, rects) -> bool:
         for rect in rects:
-            if rect.collidelist(self.__border):
+            if rect.collidelist(self.__border) != -1:
                 return True
         return False
 
-    def random_coordinate_on_field(self) -> int:
+    def random_x_on_field(self) -> int:
         cord = random.randint(1, (self.__width_in_squares - 2))
         return cord
 
+    def random_y_on_field(self) -> int:
+        cord = random.randint(1, (self.__height_in_squares - 2))
+        return cord
