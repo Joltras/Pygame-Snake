@@ -25,12 +25,23 @@ class Snake(Actor):
         :param rect: Rectangle to check collision
         :return: True when they collide otherwise False
         """
-        if rect.colliderect(self.__segments[0]):
-            return False
         if rect.collidelist(self.__segments) != -1:
             return True
         else:
             return False
+
+    def collides_with_itself(self) -> bool:
+        segm = self.__segments.copy()
+        segm.pop()
+        if self.__segments[0].collidelist(segm) != -1:
+            return True
+        else:
+            return False
+
+    def collides_with_head(self, rect: Rect) -> bool:
+        if rect.colliderect(self.__segments[0]):
+            return True
+        return False
 
     def __add_and_remove_last(self, new_head):
         self.__segments.appendleft(new_head)
