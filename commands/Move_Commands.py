@@ -5,22 +5,22 @@ from commands.Command import Command
 class MoveUpCommand(Command):
 
     def execute(self, actor: Actor):
-        return Actor.move_up()
+        return actor.move_up()
 
 
 class MoveDownCommand(Command):
 
     def execute(self, actor: Actor):
-        return Actor.move_down()
+        return actor.move_down()
 
 
 class MoveLeftCommand(Command):
 
     def execute(self, actor: Actor):
-        return Actor.move_left()
+        return actor.move_left()
 
 
 class MoveRightCommand(Command):
 
     def execute(self, actor: Actor):
-        return Actor.move_right()
+        return actor.move_right()
