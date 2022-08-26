@@ -1,5 +1,3 @@
-import random
-from Game_Field import GameField
 from Globals import SQUARE_SIZE
 from pygame import Rect
 
@@ -13,7 +11,7 @@ class Food:
         :param x:
         :param y:
         """
-        self.__rect = Rect(x, y, SQUARE_SIZE, SQUARE_SIZE)
+        self.__rect = Rect(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
 
     def get_rect(self):
         """
