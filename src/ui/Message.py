@@ -1,9 +1,9 @@
 import pygame
 from pygame import font, Rect
 
-from Globals import Color
-from Game_Field import GameField
-from Button import Button
+from src.Globals import Color
+from src.Game_Field import GameField
+from src.ui.Button import Button
 
 START_TITLE: str = "SNAKE"
 START_MESSAGE: str = "Press the button to start"

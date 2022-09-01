@@ -69,15 +69,28 @@ class GameField:
         return self.__border
 
     def collides_with_boarder(self, rects) -> bool:
+        """
+        Checks if a rectangle collides with the border.
+        :param rects: lists of rectangles
+        :return: True if they collide otherwise False
+        """
         for rect in rects:
             if rect.collidelist(self.__border) != -1:
                 return True
         return False
 
     def random_x_on_field(self) -> int:
+        """
+        Calculates a random x-coordinate on the field.
+        :return: coordinate
+        """
         cord = random.randint(1, (self.__width_in_squares - 2))
         return cord
 
     def random_y_on_field(self) -> int:
+        """
+        Calculates a random y-coordinate on the field.
+        :return: coordinate
+        """
         cord = random.randint(1, (self.__height_in_squares - 2))
         return cord

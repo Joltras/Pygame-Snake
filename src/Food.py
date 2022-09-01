@@ -6,10 +6,9 @@ class Food:
 
     def __init__(self, x: int, y: int):
         """
-        Creates a new food object.
-        A food object is a rectangle which can be randomly placed on a field.
-        :param x:
-        :param y:
+        Creates a new food object at the given coordinates
+        :param x: x-coordinate
+        :param y: y-coordinate
         """
         self.__rect = Rect(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
 
@@ -22,8 +21,8 @@ class Food:
 
     def place(self, x: int, y: int):
         """
-        Places the food-object on a random location on a field.
-        :param x:
-        :param y:
+        Places the food on the given position.
+        :param x: x-coordinate
+        :param y: y-coordinate
         """
         self.__rect = Rect(x, y, SQUARE_SIZE, SQUARE_SIZE)

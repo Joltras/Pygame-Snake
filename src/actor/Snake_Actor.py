@@ -1,19 +1,28 @@
 from collections import deque
 
 from pygame import Rect
-from Globals import SQUARE_SIZE
+from src.Globals import SQUARE_SIZE
 
-from actor.Actor import Actor
+from src.actor.Actor import Actor
 
 
 class Snake(Actor):
 
     def __init__(self, x: int, y: int):
+        """
+        Creates a new snake object with the given arguments.
+        :param x: x-coordinate
+        :param y: y-coordinate
+        """
         self.__segments = deque()
         self.__segments.append(Rect(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
         self.__last_segment = None
 
-    def get_head(self):
+    def get_head(self) -> Rect:
+        """
+        Returns the first segment of the snake.
+        :return: first segment
+        """
         return self.__segments[0]
 
     def get_length(self):
@@ -31,8 +40,12 @@ class Snake(Actor):
             return False
 
     def collides_with_itself(self) -> bool:
+        """
+        Checks if the segments of the snake collide with each other.
+        :return: True if they collide otherwise False
+        """
         segm = self.__segments.copy()
-        segm.pop()
+        segm.popleft()
         if self.__segments[0].collidelist(segm) != -1:
             return True
         else:
