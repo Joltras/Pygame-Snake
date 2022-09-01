@@ -3,7 +3,7 @@ import pygame
 from Food import Food
 from src.actor.Snake_Actor import Snake
 from src.ui import Message
-from Globals import Color, GameState, SQUARE_SIZE, BUTTON_WIDTH, BUTTON_HEIGHT
+from Globals import Color, GameState, SQUARE_SIZE, BUTTON_WIDTH, BUTTON_HEIGHT, FIELD_COLOR
 from src.ui.Message import MessageDisplayer
 from Game_Field import GameField
 from src.ui.Button import Button
@@ -21,11 +21,13 @@ class Game:
         :param height: height of the game window
         """
 
+        field_width: int = int(width * 0.8)
+        field_height: int = int(height * 0.8)
         placed_food: bool
-        width_in_squares: int = width // SQUARE_SIZE
-        height_in_squares: int = height // SQUARE_SIZE
+        width_in_squares: int = field_width // SQUARE_SIZE
+        height_in_squares: int = field_height // SQUARE_SIZE
 
-        self.__field: GameField = GameField(width_in_squares, height_in_squares)
+        self.__field: GameField = GameField(width_in_squares, height_in_squares, SQUARE_SIZE, SQUARE_SIZE)
 
         self.__actor: Snake = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field())
         self.__screen = pygame.display.set_mode((width, height))
@@ -71,7 +73,7 @@ class Game:
         Draws all the objects.
         """
         self.__screen.fill(Color.WHITE.value)
-
+        pygame.draw.rect(self.__screen, FIELD_COLOR.value, self.__field.get_rect())
         for rect in self.__field.get_border():
             pygame.draw.rect(self.__screen, Color.LIGHT_GRAY.value, rect)
             pygame.draw.rect(self.__screen, Color.GRAY.value, rect, 2, 1)
