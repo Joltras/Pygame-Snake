@@ -5,8 +5,13 @@ from Globals import SQUARE_SIZE
 
 
 class GameField:
+    width_in_squares: int
+    height_in_squares: int
+    x: int
+    y: int
+    border: list
 
-    def __init__(self, width_in_squares, height_in_squares):
+    def __init__(self, width_in_squares, height_in_squares, left: int, top: int):
         """
         Creates a new GameField with the given data.
         :param width_in_squares: numbers of squares that fit a row of the field
@@ -18,19 +23,24 @@ class GameField:
         self.__height_in_squares = height_in_squares
         self.__height = height_in_squares * SQUARE_SIZE
 
+        self.__left = left
+        self.__top = top
+        self.__field_rect = Rect(top, left, self.__width, self.__height)
+
         # Create the border of the field
         self.__border = []
         i = 0
         while i < height_in_squares:
             if i == 0 or i == height_in_squares - 1:
+                # Top and bottom of the field
                 j = 0
                 while j < width_in_squares:
-                    self.__border.append(Rect(j * SQUARE_SIZE, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                    self.__border.append(Rect(j * SQUARE_SIZE + top, i * SQUARE_SIZE + left, SQUARE_SIZE, SQUARE_SIZE))
                     j += 1
             else:
-                self.__border.append(Rect(0, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                self.__border.append(Rect(top, i * SQUARE_SIZE + left, SQUARE_SIZE, SQUARE_SIZE))
                 self.__border.append(
-                    Rect((width_in_squares * SQUARE_SIZE) - SQUARE_SIZE, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                    Rect((width_in_squares * SQUARE_SIZE) - SQUARE_SIZE + top, i * SQUARE_SIZE + left, SQUARE_SIZE, SQUARE_SIZE))
             i += 1
 
     def get_width(self) -> int:
@@ -67,6 +77,9 @@ class GameField:
         :return: Border of the field
         """
         return self.__border
+
+    def get_rect(self):
+        return self.__field_rect
 
     def collides_with_boarder(self, rects) -> bool:
         """
