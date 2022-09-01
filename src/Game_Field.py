@@ -1,22 +1,22 @@
+import random
+
 from pygame import Rect
+from Globals import SQUARE_SIZE
 
 
 class GameField:
 
-    def __init__(self, width_in_squares, height_in_squares, square_size):
+    def __init__(self, width_in_squares, height_in_squares):
         """
         Creates a new GameField with the given data.
         :param width_in_squares: numbers of squares that fit a row of the field
         :param height_in_squares: number of squares that fit in a column of the field
-        :param square_size: size of one square
         """
         self.__width_in_squares = width_in_squares
-        self.__width = width_in_squares * square_size
+        self.__width = width_in_squares * SQUARE_SIZE
 
         self.__height_in_squares = height_in_squares
-        self.__height = height_in_squares * square_size
-
-        self.__square_size = square_size
+        self.__height = height_in_squares * SQUARE_SIZE
 
         # Create the border of the field
         self.__border = []
@@ -25,12 +25,12 @@ class GameField:
             if i == 0 or i == height_in_squares - 1:
                 j = 0
                 while j < width_in_squares:
-                    self.__border.append(Rect(j * square_size, i * square_size, square_size, square_size))
+                    self.__border.append(Rect(j * SQUARE_SIZE, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
                     j += 1
             else:
-                self.__border.append(Rect(0, i * square_size, square_size, square_size))
+                self.__border.append(Rect(0, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
                 self.__border.append(
-                    Rect((width_in_squares * square_size) - square_size, i * square_size, square_size, square_size))
+                    Rect((width_in_squares * SQUARE_SIZE) - SQUARE_SIZE, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
             i += 1
 
     def get_width(self) -> int:
@@ -61,16 +61,36 @@ class GameField:
         """
         return self.__height_in_squares
 
-    def get_square_size(self):
-        """
-        Returns the size of one square.
-        :return: Size of a square
-        """
-        return self.__square_size
-
     def get_border(self) -> list:
         """
         Returns the border of the field as a list of rectangles.
         :return: Border of the field
         """
         return self.__border
+
+    def collides_with_boarder(self, rects) -> bool:
+        """
+        Checks if a rectangle collides with the border.
+        :param rects: lists of rectangles
+        :return: True if they collide otherwise False
+        """
+        for rect in rects:
+            if rect.collidelist(self.__border) != -1:
+                return True
+        return False
+
+    def random_x_on_field(self) -> int:
+        """
+        Calculates a random x-coordinate on the field.
+        :return: coordinate
+        """
+        cord = random.randint(1, (self.__width_in_squares - 2))
+        return cord
+
+    def random_y_on_field(self) -> int:
+        """
+        Calculates a random y-coordinate on the field.
+        :return: coordinate
+        """
+        cord = random.randint(1, (self.__height_in_squares - 2))
+        return cord

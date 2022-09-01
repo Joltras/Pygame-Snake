@@ -1,5 +1,8 @@
 from enum import Enum
-
+BUTTON_WIDTH = 100
+BUTTON_HEIGHT = 30
+NUMBER_OF_SQUARES = 50
+SQUARE_SIZE = 20
 
 class Direction(Enum):
     UP = 0
