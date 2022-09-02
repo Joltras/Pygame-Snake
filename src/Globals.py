@@ -3,7 +3,7 @@ from enum import Enum
 BUTTON_WIDTH = 100
 BUTTON_HEIGHT = 30
 NUMBER_OF_SQUARES = 50
-SQUARE_SIZE = 20
+SQUARE_SIZE = 30
 
 
 class Direction(Enum):
