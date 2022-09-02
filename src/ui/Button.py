@@ -46,7 +46,6 @@ class Button:
         Checks if the button has been clicked.
         :param x: x-coordinate of the click
         :param y: y-coordinate of the click
-        :return: True if the button has been clicked, False otherwise
         """
         if self.__rect.collidepoint(x, y):
             self.__on_click()
