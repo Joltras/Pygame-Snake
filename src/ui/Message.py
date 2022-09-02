@@ -31,13 +31,16 @@ class MessageDisplayer:
     def __init__(self, width, height, top: int, left: int):
         """
         Creates a new MessageDisplayer.
+        :param width: Width of the message
+        :param height: Height of the message
+        :param top: y offset
+        :param left: x offset
         """
         font.init()
         self.__top = top
         self.__left = left
         self.__background: Rect = Rect(left, top, width, height)
         self.__title_font = font.SysFont(font.get_default_font(), TITLE_FONT_SIZE)
-        self.__message_font = font.SysFont(font.get_default_font(), MESSAGE_FONT_SIZE)
 
     def create_message(self, field: GameField, text: str, screen, button1: Button, button2: Button):
         """
