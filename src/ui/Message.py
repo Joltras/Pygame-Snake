@@ -28,14 +28,19 @@ class MessageDisplayer:
     Object of this class create Messages with given Colors and Fonts.
     """
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, top: int, left: int):
         """
         Creates a new MessageDisplayer.
+        :param width: Width of the message
+        :param height: Height of the message
+        :param top: y offset
+        :param left: x offset
         """
         font.init()
-        self.__background: Rect = Rect(0, 0, width, height)
+        self.__top = top
+        self.__left = left
+        self.__background: Rect = Rect(left, top, width, height)
         self.__title_font = font.SysFont(font.get_default_font(), TITLE_FONT_SIZE)
-        self.__message_font = font.SysFont(font.get_default_font(), MESSAGE_FONT_SIZE)
 
     def create_message(self, field: GameField, text: str, screen, button1: Button, button2: Button):
         """
@@ -49,8 +54,8 @@ class MessageDisplayer:
         x_pos: int = field.get_height() // 2
 
         self.create_title_message(field, text, screen)
-        button1.draw(screen, x_pos - button1.get_width(), y_pos + button1.get_height())
-        button2.draw(screen, x_pos + button2.get_width(), y_pos + button2.get_height())
+        button1.draw(screen, x_pos - button1.get_width() + self.__left, y_pos + button1.get_height() + self.__top)
+        button2.draw(screen, x_pos + button2.get_width() + self.__left, y_pos + button2.get_height() + self.__top)
 
     def create_title_message(self, field: GameField, text: str, screen):
         """
@@ -60,8 +65,8 @@ class MessageDisplayer:
         :param screen: Screen to place the title on
         """
         title = self.__title_font.render(text, True, TITLE_COLOR)
-        y_pos = field.get_height() / 2 - self.__title_font.size(text)[1] / 2
-        x_pos = field.get_width() / 2 - self.__title_font.size(text)[0] / 2
+        y_pos = field.get_height() / 2 - self.__title_font.size(text)[1] / 2 + self.__top
+        x_pos = field.get_width() / 2 - self.__title_font.size(text)[0] / 2 + self.__left
 
         screen.blit(title, (x_pos, y_pos - title.get_height()))
 

@@ -1,8 +1,10 @@
 from enum import Enum
+
 BUTTON_WIDTH = 100
 BUTTON_HEIGHT = 30
 NUMBER_OF_SQUARES = 50
-SQUARE_SIZE = 20
+SQUARE_SIZE = 30
+
 
 class Direction(Enum):
     UP = 0
@@ -23,6 +25,10 @@ class Color(Enum):
     DARK_GRAY = (100, 100, 100)
     YELLOW = (250, 250, 55)
     VIOLET = (148, 0, 211)
+
+
+FIELD_COLOR = Color.LIGHT_GRAY
+BACKGROUND_COLOR = Color.DARK_GRAY
 
 
 class GameState(Enum):

@@ -5,8 +5,13 @@ from Globals import SQUARE_SIZE
 
 
 class GameField:
+    width_in_squares: int
+    height_in_squares: int
+    x: int
+    y: int
+    border: list
 
-    def __init__(self, width_in_squares, height_in_squares):
+    def __init__(self, width_in_squares, height_in_squares, left: int, top: int):
         """
         Creates a new GameField with the given data.
         :param width_in_squares: numbers of squares that fit a row of the field
@@ -18,20 +23,31 @@ class GameField:
         self.__height_in_squares = height_in_squares
         self.__height = height_in_squares * SQUARE_SIZE
 
+        self.__left = left
+        self.__top = top
+        self.__field_rect = Rect(left, top, self.__width, self.__height)
+
         # Create the border of the field
         self.__border = []
-        i = 0
-        while i < height_in_squares:
-            if i == 0 or i == height_in_squares - 1:
-                j = 0
-                while j < width_in_squares:
-                    self.__border.append(Rect(j * SQUARE_SIZE, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
-                    j += 1
+        y_cord = 0
+        while y_cord < height_in_squares:
+            if y_cord == 0 or y_cord == height_in_squares - 1:
+                # Top and bottom of the field
+                x_cord = 0
+                while x_cord < width_in_squares:
+                    self.__border.append(Rect(x_cord * SQUARE_SIZE + left, y_cord * SQUARE_SIZE + top, SQUARE_SIZE, SQUARE_SIZE))
+                    x_cord += 1
             else:
-                self.__border.append(Rect(0, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                self.__border.append(Rect(left, y_cord * SQUARE_SIZE + top, SQUARE_SIZE, SQUARE_SIZE))
                 self.__border.append(
-                    Rect((width_in_squares * SQUARE_SIZE) - SQUARE_SIZE, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
-            i += 1
+                    Rect((width_in_squares * SQUARE_SIZE) - SQUARE_SIZE + left, y_cord * SQUARE_SIZE + top, SQUARE_SIZE, SQUARE_SIZE))
+            y_cord += 1
+
+    def get_top(self) -> int:
+        return self.__top
+
+    def get_left(self) -> int:
+        return self.__left
 
     def get_width(self) -> int:
         """
@@ -67,6 +83,9 @@ class GameField:
         :return: Border of the field
         """
         return self.__border
+
+    def get_rect(self):
+        return self.__field_rect
 
     def collides_with_boarder(self, rects) -> bool:
         """
