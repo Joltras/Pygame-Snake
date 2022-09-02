@@ -13,6 +13,8 @@ class Snake(Actor):
         Creates a new snake object with the given arguments.
         :param x: x-coordinate
         :param y: y-coordinate
+        :param top: top offset
+        :param left: left offset
         """
         self.__segments = deque()
         self.__segments.append(Rect(x * SQUARE_SIZE + left, y * SQUARE_SIZE + top, SQUARE_SIZE, SQUARE_SIZE))
