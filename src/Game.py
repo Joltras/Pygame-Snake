@@ -1,19 +1,25 @@
+from typing import Union
+
 import pygame
+from pygame import Rect
+from pygame.surface import Surface, SurfaceType
 
 from Food import Food
-from src.actor.Snake_Actor import Snake
-from src.ui import Message
-from Globals import Color, GameState, SQUARE_SIZE, BUTTON_WIDTH, BUTTON_HEIGHT, FIELD_COLOR
-from src.ui.Message import MessageDisplayer
 from Game_Field import GameField
-from src.ui.Button import Button
+from Globals import Color, GameState, SQUARE_SIZE, BUTTON_WIDTH, BUTTON_HEIGHT, FIELD_COLOR
+from src.actor.Snake_Actor import Snake
 from src.commands.Command import Command
 from src.commands.Grow import GrowCommand
 from src.commands.Move_Commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
-from pygame import Rect
+from src.ui import Message
+from src.ui.Button import Button
+from src.ui.Message import MessageDisplayer
 
 
 class Game:
+    __screen: Union[Surface, SurfaceType]
+    __actor: Snake
+    __field: GameField
     grow: GrowCommand
 
     def __init__(self, width: int, height: int):
@@ -42,7 +48,7 @@ class Game:
                                                                       self.__field.get_height(), self.__field.get_top(),
                                                                       self.__field.get_left())
         self.__food: Food
-        self.set_food()
+        self._set_food()
 
         self.__game_state: GameState = GameState.STARTING
         self.__start_button = Button(BUTTON_WIDTH, BUTTON_HEIGHT, "Start", self.set_running)
@@ -56,16 +62,28 @@ class Game:
         self.move_right = MoveRightCommand()
         self.grow = GrowCommand()
 
-    def set_running(self):
+    def set_running(self) -> None:
+        """
+         Sets the current game state to running.
+        """
         self.__game_state = GameState.RUNNING
 
-    def set_closing(self):
+    def set_closing(self) -> None:
+        """
+         Sets the current game state to closing.
+        """
         self.__game_state = GameState.CLOSE_GAME
 
-    def set_starting(self):
+    def set_starting(self) -> None:
+        """
+         Sets the current game state to starting.
+        """
         self.__game_state = GameState.STARTING
 
-    def set_food(self):
+    def _set_food(self) -> None:
+        """
+        Placed a new food object on the field
+        """
         placed_food = False
         while not placed_food:
             x = self.__field.random_x_on_field()
@@ -128,7 +146,10 @@ class Game:
             pygame.display.flip()
             self.__clock.tick(5)
 
-    def _starting(self):
+    def _starting(self) -> None:
+        """
+        Displays the starting message and reacts to input.
+        """
         self.__message_displayer.create_message(self.__field, Message.START_TITLE, self.__screen,
                                                 self.__start_button,
                                                 self.__exit_button)
@@ -144,6 +165,11 @@ class Game:
                 self.__exit_button.has_been_clicked(event.pos[0], event.pos[1])
 
     def _running(self, command: Command) -> Command:
+        """
+        Reacts to the inputs while in game state running.
+        :param command: current command
+        :return: new command if changed otherwise the given command
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.__game_state = GameState.CLOSE_GAME
@@ -162,12 +188,15 @@ class Game:
             elif self.__actor.collides_with_itself():
                 self.__game_state = GameState.GAME_OVER
             elif self.__actor.collides_with_head(self.__food.get_rect()):
-                self.set_food()
+                self._set_food()
                 self.grow.execute(self.__actor)
         self.draw()
         return command
 
-    def _pausing(self):
+    def _pausing(self) -> None:
+        """
+        Displays the pausing message and reacts to input.
+        """
         self.__message_displayer.create_message(self.__field, Message.PAUSED_TITLE, self.__screen,
                                                 self.__continue_button, self.__exit_button)
         for event in pygame.event.get():
@@ -180,7 +209,10 @@ class Game:
                 self.__exit_button.has_been_clicked(event.pos[0], event.pos[1])
                 self.__continue_button.has_been_clicked(event.pos[0], event.pos[1])
 
-    def _losing(self):
+    def _losing(self) -> None:
+        """
+         Displays the losing message and reacts to input.
+        """
         self.__message_displayer.create_message(self.__field, Message.GAME_OVER_TITLE, self.__screen,
                                                 self.__restart_button,
                                                 self.__exit_button)
@@ -200,6 +232,11 @@ class Game:
                     self.__actor = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field(), self.__field.get_top(), self.__field.get_left())
 
     def handle_input(self, event) -> Command:
+        """
+        Checks the event and returns the corresponding command.
+        :param event: event
+        :return: command
+        """
         command: Command = None
         if event.key == pygame.K_DOWN:
             command = self.move_down
