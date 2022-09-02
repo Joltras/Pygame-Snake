@@ -8,14 +8,14 @@ from src.actor.Actor import Actor
 
 class Snake(Actor):
 
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int, top: int, left: int):
         """
         Creates a new snake object with the given arguments.
         :param x: x-coordinate
         :param y: y-coordinate
         """
         self.__segments = deque()
-        self.__segments.append(Rect(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+        self.__segments.append(Rect(x * SQUARE_SIZE + left, y * SQUARE_SIZE + top, SQUARE_SIZE, SQUARE_SIZE))
         self.__last_segment = None
 
     def get_head(self) -> Rect:
