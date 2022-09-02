@@ -10,6 +10,8 @@ from src.ui.Button import Button
 from src.commands.Command import Command
 from src.commands.Grow import GrowCommand
 from src.commands.Move_Commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
+from pygame import Rect
+
 
 class Game:
     grow: GrowCommand
@@ -21,20 +23,24 @@ class Game:
         :param height: height of the game window
         """
 
-        field_width: int = int(width * 0.8)
+        field_width: int = int(width * 0.5)
         field_height: int = int(height * 0.8)
         placed_food: bool
         width_in_squares: int = field_width // SQUARE_SIZE
         height_in_squares: int = field_height // SQUARE_SIZE
+        self.__info = Rect(width_in_squares // 2 * SQUARE_SIZE, height_in_squares * SQUARE_SIZE, width_in_squares * SQUARE_SIZE,
+                           height * 0.2)
 
-        self.__field: GameField = GameField(width_in_squares, height_in_squares, SQUARE_SIZE, SQUARE_SIZE)
+        self.__field: GameField = GameField(width_in_squares, height_in_squares, width_in_squares // 2 * SQUARE_SIZE,
+                                            0)
 
-        self.__actor: Snake = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field())
+        self.__actor: Snake = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field(), self.__field.get_top(), self.__field.get_left())
         self.__screen = pygame.display.set_mode((width, height))
         self.__clock = pygame.time.Clock()
 
         self.__message_displayer: MessageDisplayer = MessageDisplayer(self.__field.get_width(),
-                                                                      self.__field.get_height())
+                                                                      self.__field.get_height(), self.__field.get_top(),
+                                                                      self.__field.get_left())
         self.__food: Food
         self.set_food()
 
@@ -64,7 +70,7 @@ class Game:
         while not placed_food:
             x = self.__field.random_x_on_field()
             y = self.__field.random_y_on_field()
-            self.__food = Food(x, y)
+            self.__food = Food(x, y, self.__field.get_top(), self.__field.get_left())
             if not self.__actor.collides_with_body(self.__food.get_rect()):
                 placed_food = True
 
@@ -73,6 +79,7 @@ class Game:
         Draws all the objects.
         """
         self.__screen.fill(Color.WHITE.value)
+        pygame.draw.rect(self.__screen,Color.ORANGE.value, self.__info)
         pygame.draw.rect(self.__screen, FIELD_COLOR.value, self.__field.get_rect())
         for rect in self.__field.get_border():
             pygame.draw.rect(self.__screen, Color.LIGHT_GRAY.value, rect)
@@ -182,7 +189,7 @@ class Game:
                 self.__game_state = GameState.CLOSE_GAME
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
-                    self.__actor = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field())
+                    self.__actor = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field(), self.__field.get_top(), self.__field.get_left())
                     self.__game_state = GameState.STARTING
                 elif event.key == pygame.K_n:
                     self.__game_state = GameState.CLOSE_GAME
@@ -190,7 +197,7 @@ class Game:
                 self.__exit_button.has_been_clicked(event.pos[0], event.pos[1])
                 self.__restart_button.has_been_clicked(event.pos[0], event.pos[1])
                 if self.__game_state.value == 0:
-                    self.__actor = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field())
+                    self.__actor = Snake(self.__field.random_x_on_field(), self.__field.random_y_on_field(), self.__field.get_top(), self.__field.get_left())
 
     def handle_input(self, event) -> Command:
         command: Command = None
