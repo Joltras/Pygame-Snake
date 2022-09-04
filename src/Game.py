@@ -12,9 +12,10 @@ from src.commands.Command import Command
 from src.commands.Grow import GrowCommand
 from src.commands.Move_Commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
 from src.ui import Message
-from src.ui.Button import Button
+from src.ui.TextButton import TextButton, ImageButton
 from src.ui.Message import MessageDisplayer
 
+START_BUTTON_IMAGE = pygame.image.load("StartButton.png")
 
 class Game:
     __screen: Union[Surface, SurfaceType]
@@ -51,10 +52,10 @@ class Game:
         self._set_food()
 
         self.__game_state: GameState = GameState.STARTING
-        self.__start_button = Button(BUTTON_WIDTH, BUTTON_HEIGHT, "Start", self.set_running)
-        self.__exit_button = Button(BUTTON_WIDTH, BUTTON_HEIGHT, "Exit", self.set_closing, Color.ORANGE)
-        self.__restart_button = Button(BUTTON_WIDTH, BUTTON_HEIGHT, "Restart", self.set_starting)
-        self.__continue_button = Button(BUTTON_WIDTH, BUTTON_HEIGHT, "Continue", self.set_running)
+        self.__start_button = ImageButton(START_BUTTON_IMAGE, self.set_running)
+        self.__exit_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Exit", self.set_closing, Color.ORANGE)
+        self.__restart_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Restart", self.set_starting)
+        self.__continue_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Continue", self.set_running)
 
         self.move_up = MoveUpCommand()
         self.move_down = MoveDownCommand()
