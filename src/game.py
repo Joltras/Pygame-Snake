@@ -97,9 +97,7 @@ class Game:
         """
         self._screen.fill(Color.WHITE.value)
         pygame.draw.rect(self._screen, FIELD_COLOR.value, self._field.get_rect())
-        for rect in self._field.get_border():
-            pygame.draw.rect(self._screen, Color.LIGHT_GRAY.value, rect)
-            pygame.draw.rect(self._screen, Color.GRAY.value, rect, 2, 1)
+        self._field.draw(self._screen)
 
         for rect in self._actor.get_segments():
             pygame.draw.rect(self._screen, Color.GREEN.value, rect)
