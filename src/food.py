@@ -1,4 +1,4 @@
-from Globals import SQUARE_SIZE
+from src.utils.globals import SQUARE_SIZE
 from pygame import Rect
 
 

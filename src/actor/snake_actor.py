@@ -1,9 +1,9 @@
 from collections import deque
 
 from pygame import Rect
-from src.Globals import SQUARE_SIZE
+from src.utils.globals import SQUARE_SIZE
 
-from src.actor.Actor import Actor
+from src.actor.actor import Actor
 
 
 class Snake(Actor):

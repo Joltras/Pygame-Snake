@@ -1,5 +1,5 @@
-from src.actor.Actor import Actor
-from src.commands.Command import Command
+from src.actor.actor import Actor
+from src.commands.command import Command
 
 
 class MoveUpCommand(Command):

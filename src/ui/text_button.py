@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import pygame.draw
 from pygame import Rect, font
-from src.Globals import Color
+from src.utils.globals import Color
 
 TEXT_COLOR: Color = Color.BLACK
 FONT_SIZE = 25

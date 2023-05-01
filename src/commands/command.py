@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.actor.Actor import Actor
+from src.actor.actor import Actor
 
 
 class Command(ABC):
