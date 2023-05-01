@@ -1,9 +1,9 @@
 import pygame
 from pygame import font, Rect
 
+from src.ui.buttons.button.button import Button
 from src.utils.globals import Color
-from src.game_field import GameField
-from src.ui.buttons.button.text_button import TextButton
+from src.elements.game_field import GameField
 
 START_TITLE: str = "SNAKE"
 START_MESSAGE: str = "Press the button to start"
@@ -42,7 +42,7 @@ class MessageDisplayer:
         self.__background: Rect = Rect(left, top, width, height)
         self.__title_font = font.SysFont(font.get_default_font(), TITLE_FONT_SIZE)
 
-    def create_message(self, field: GameField, text: str, screen, button1: TextButton, button2: TextButton):
+    def create_message(self, field: GameField, text: str, screen, button1: Button, button2: Button):
         """
         Creates a message and displays it within the given field on the given screen.
         :param field: GameField
@@ -69,5 +69,3 @@ class MessageDisplayer:
         x_pos = field.get_width() / 2 - self.__title_font.size(text)[0] / 2 + self.__left
 
         screen.blit(title, (x_pos, y_pos - title.get_height()))
-
-
