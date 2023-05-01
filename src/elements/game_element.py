@@ -5,5 +5,9 @@ from typing import List
 class GameElement(ABC):
 
     @abstractmethod
-    def draw(self, screen):
+    def collides(self, rects) -> bool:
+        pass
+
+    @abstractmethod
+    def draw(self, screen) -> None:
         pass
