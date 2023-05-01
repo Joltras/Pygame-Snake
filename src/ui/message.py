@@ -3,7 +3,7 @@ from pygame import font, Rect
 
 from src.utils.globals import Color
 from src.game_field import GameField
-from src.ui.text_button import TextButton
+from src.ui.buttons.button.text_button import TextButton
 
 START_TITLE: str = "SNAKE"
 START_MESSAGE: str = "Press the button to start"

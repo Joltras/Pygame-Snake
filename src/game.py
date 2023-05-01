@@ -6,6 +6,7 @@ from pygame.surface import Surface, SurfaceType
 
 from food import Food
 from game_field import GameField
+from src.ui import message
 from src.utils.color import Color
 from src.utils.game_state import GameState
 from src.utils.globals import SQUARE_SIZE, BUTTON_WIDTH, BUTTON_HEIGHT, FIELD_COLOR
@@ -13,7 +14,7 @@ from src.actor.snake_actor import Snake
 from src.commands.command import Command
 from src.commands.grow import GrowCommand
 from src.commands.move_commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
-from src.ui.text_button import TextButton, ImageButton
+from src.ui.buttons.button.text_button import TextButton, ImageButton
 from src.ui.message import MessageDisplayer
 
 START_BUTTON_IMAGE = pygame.image.load("StartButton.png")
@@ -155,9 +156,8 @@ class Game:
         """
         Displays the starting message and reacts to input.
         """
-        self._message_displayer.create_message(self._field, Message.START_TITLE, self._screen,
-                                               self._start_button,
-                                               self._exit_button)
+        self._message_displayer.create_message(self._field, message.START_TITLE, self._screen,
+                                               self._start_button, self._exit_button)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._game_state = GameState.CLOSE_GAME
