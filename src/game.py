@@ -7,6 +7,8 @@ from pygame.surface import Surface, SurfaceType
 from food import Food
 from game_field import GameField
 from src.ui import message
+from src.ui.buttons.button.image_button import ImageButton
+from src.ui.buttons.button.text_button import TextButton
 from src.utils.color import Color
 from src.utils.game_state import GameState
 from src.utils.globals import SQUARE_SIZE, BUTTON_WIDTH, BUTTON_HEIGHT, FIELD_COLOR
@@ -14,7 +16,6 @@ from src.actor.snake_actor import Snake
 from src.commands.command import Command
 from src.commands.grow import GrowCommand
 from src.commands.move_commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
-from src.ui.buttons.button.text_button import TextButton, ImageButton
 from src.ui.message import MessageDisplayer
 
 START_BUTTON_IMAGE = pygame.image.load("StartButton.png")
@@ -33,17 +34,9 @@ class Game:
         :param height: height of the game window
         """
 
-        field_width: int = int(width * 0.5)
-        field_height: int = int(height * 0.8)
         placed_food: bool
-        width_in_squares: int = field_width // SQUARE_SIZE
-        height_in_squares: int = field_height // SQUARE_SIZE
-        self._info = Rect(width_in_squares // 2 * SQUARE_SIZE, height_in_squares * SQUARE_SIZE,
-                          width_in_squares * SQUARE_SIZE,
-                          height * 0.2)
 
-        self._field: GameField = GameField(width_in_squares, height_in_squares, width_in_squares // 2 * SQUARE_SIZE,
-                                           0)
+        self._field: GameField = GameField(width=width, height= height)
 
         self._actor: Snake = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
                                    self._field.get_top(), self._field.get_left())
@@ -103,7 +96,6 @@ class Game:
         Draws all the objects.
         """
         self._screen.fill(Color.WHITE.value)
-        pygame.draw.rect(self._screen, Color.ORANGE.value, self._info)
         pygame.draw.rect(self._screen, FIELD_COLOR.value, self._field.get_rect())
         for rect in self._field.get_border():
             pygame.draw.rect(self._screen, Color.LIGHT_GRAY.value, rect)
@@ -202,7 +194,7 @@ class Game:
         """
         Displays the pausing message and reacts to input.
         """
-        self._message_displayer.create_message(self._field, Message.PAUSED_TITLE, self._screen,
+        self._message_displayer.create_message(self._field, message.PAUSED_TITLE, self._screen,
                                                self._continue_button, self._exit_button)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -218,7 +210,7 @@ class Game:
         """
          Displays the losing message and reacts to input.
         """
-        self._message_displayer.create_message(self._field, Message.GAME_OVER_TITLE, self._screen,
+        self._message_displayer.create_message(self._field, message.GAME_OVER_TITLE, self._screen,
                                                self._restart_button,
                                                self._exit_button)
         for event in pygame.event.get():
