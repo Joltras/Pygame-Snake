@@ -1,11 +1,10 @@
 import random
-
-import pygame
-from pygame import Rect
-
+from overrides import override
+from src.elements.game_border import GameBorder
 from src.elements.game_element import GameElement
-from src.utils.color import Color
+from src.elements.playing_area import PlayingArea
 from src.utils.globals import SQUARE_SIZE
+from typing import List
 
 
 class GameField(GameElement):
@@ -26,26 +25,11 @@ class GameField(GameElement):
 
         self._left = left
         self._top = top
-        self._field_rect = Rect(left, top, self._width, self._height)
+
+        self._elements: List[GameElement] = [PlayingArea(width=self._width_in_squares, height=self._height_in_squares),
+                                             GameBorder(width_in_squares=width, height_in_squares=height)]
 
         # Create the border of the field
-        self._border = []
-        y_cord = 0
-        while y_cord < self._height_in_squares:
-            if y_cord == 0 or y_cord == self._height_in_squares - 1:
-                # Top and bottom of the field
-                x_cord = 0
-                while x_cord < self._width_in_squares:
-                    self._border.append(
-                        Rect(x_cord * SQUARE_SIZE + left, y_cord * SQUARE_SIZE + top, SQUARE_SIZE, SQUARE_SIZE))
-                    x_cord += 1
-            else:
-                self._border.append(Rect(left, y_cord * SQUARE_SIZE + top, SQUARE_SIZE, SQUARE_SIZE))
-                self._border.append(
-                    Rect((self._width_in_squares * SQUARE_SIZE) - SQUARE_SIZE + left, y_cord * SQUARE_SIZE + top, SQUARE_SIZE,
-                         SQUARE_SIZE))
-            y_cord += 1
-
     def get_top(self) -> int:
         return self._top
 
@@ -80,26 +64,14 @@ class GameField(GameElement):
         """
         return self._height_in_squares
 
-    def get_border(self) -> list:
-        """
-        Returns the border of the field as a list of rectangles.
-        :return: Border of the field
-        """
-        return self._border
-
-    def get_rect(self):
-        return self._field_rect
-
-    def collides_with_boarder(self, rects) -> bool:
+    @override
+    def collides(self, rects) -> bool:
         """
         Checks if a rectangle collides with the border.
         :param rects: lists of rectangles
         :return: True if they collide otherwise False
         """
-        for rect in rects:
-            if rect.collidelist(self._border) != -1:
-                return True
-        return False
+        return self._elements[1].collides(rects=rects)
 
     def random_x_on_field(self) -> int:
         """
@@ -117,7 +89,7 @@ class GameField(GameElement):
         cord = random.randint(1, (self._height_in_squares - 2))
         return cord
 
-    def draw(self, screen):
-        for rect in self._border:
-            pygame.draw.rect(screen, Color.LIGHT_GRAY.value, rect)
-            pygame.draw.rect(screen, Color.GRAY.value, rect, 2, 1)
+    @override
+    def draw(self, screen) -> None:
+        for element in self._elements:
+            element.draw(screen)
