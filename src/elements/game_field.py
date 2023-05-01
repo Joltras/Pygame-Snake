@@ -3,16 +3,12 @@ import random
 import pygame
 from pygame import Rect
 
+from src.elements.game_element import GameElement
 from src.utils.color import Color
 from src.utils.globals import SQUARE_SIZE
 
 
-class GameField:
-    width_in_squares: int
-    height_in_squares: int
-    x: int
-    y: int
-    border: list
+class GameField(GameElement):
 
     def __init__(self, width, height, left: int = 0, top: int = 0):
         """
