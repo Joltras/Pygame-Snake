@@ -5,13 +5,13 @@ from pygame import Rect
 from pygame.surface import Surface, SurfaceType
 
 from food import Food
-from game_field import GameField
+from src.elements.game_field import GameField
 from src.ui import message
 from src.ui.buttons.button.image_button import ImageButton
 from src.ui.buttons.button.text_button import TextButton
 from src.utils.color import Color
 from src.utils.game_state import GameState
-from src.utils.globals import SQUARE_SIZE, BUTTON_WIDTH, BUTTON_HEIGHT, FIELD_COLOR
+from src.utils.globals import BUTTON_WIDTH, BUTTON_HEIGHT
 from src.actor.snake_actor import Snake
 from src.commands.command import Command
 from src.commands.grow import GrowCommand
@@ -36,7 +36,7 @@ class Game:
 
         placed_food: bool
 
-        self._field: GameField = GameField(width=width, height= height)
+        self._field: GameField = GameField(width=width, height=height)
 
         self._actor: Snake = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
                                    self._field.get_top(), self._field.get_left())
@@ -96,7 +96,6 @@ class Game:
         Draws all the objects.
         """
         self._screen.fill(Color.WHITE.value)
-        pygame.draw.rect(self._screen, FIELD_COLOR.value, self._field.get_rect())
         self._field.draw(self._screen)
 
         for rect in self._actor.get_segments():
@@ -178,7 +177,7 @@ class Game:
                     command = n_command
         if command is not None:
             command.execute(self._actor)
-            if self._field.collides_with_boarder(self._actor.get_segments()):
+            if self._field.collides(self._actor.get_segments()):
                 self._game_state = GameState.GAME_OVER
             elif self._actor.collides_with_itself():
                 self._game_state = GameState.GAME_OVER
