@@ -1,4 +1,4 @@
-from src.actor.actor import Actor
+from src.elements.actor.actor import Actor
 from src.commands.command import Command
 
 
