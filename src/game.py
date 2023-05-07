@@ -12,7 +12,7 @@ from src.ui.buttons.button.text_button import TextButton
 from src.utils.color import Color
 from src.utils.game_state import GameState
 from src.utils.globals import BUTTON_WIDTH, BUTTON_HEIGHT
-from src.actor.snake_actor import Snake
+from src.elements.actor.snake_actor import Snake
 from src.commands.command import Command
 from src.commands.grow import GrowCommand
 from src.commands.move_commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
@@ -46,7 +46,7 @@ class Game:
         self._message_displayer: MessageDisplayer = MessageDisplayer(self._field.get_width(),
                                                                      self._field.get_height(), self._field.get_top(),
                                                                      self._field.get_left())
-        self.__food: Food
+        self._food: Food
         self._set_food()
 
         self._game_state: GameState = GameState.STARTING
@@ -87,8 +87,8 @@ class Game:
         while not placed_food:
             x = self._field.random_x_on_field()
             y = self._field.random_y_on_field()
-            self.__food = Food(x, y, self._field.get_top(), self._field.get_left())
-            if not self._actor.collides_with_body(self.__food.get_rect()):
+            self._food = Food(x, y, self._field.get_top(), self._field.get_left())
+            if not self._actor.collides([self._food.get_rect()]):
                 placed_food = True
 
     def draw(self):
@@ -97,13 +97,9 @@ class Game:
         """
         self._screen.fill(Color.WHITE.value)
         self._field.draw(self._screen)
-
-        for rect in self._actor.get_segments():
-            pygame.draw.rect(self._screen, Color.GREEN.value, rect)
-            pygame.draw.rect(self._screen, Color.DARK_GREEN.value, rect, 2, 1)
-
-        pygame.draw.rect(self._screen, Color.BLACK.value, self.__food.get_rect())
-        pygame.draw.rect(self._screen, Color.DARK_GRAY.value, self.__food.get_rect(), 2, 1)
+        self._actor.draw(self._screen)
+        pygame.draw.rect(self._screen, Color.BLACK.value, self._food.get_rect())
+        pygame.draw.rect(self._screen, Color.DARK_GRAY.value, self._food.get_rect(), 2, 1)
 
     def run(self):
         """
@@ -181,7 +177,7 @@ class Game:
                 self._game_state = GameState.GAME_OVER
             elif self._actor.collides_with_itself():
                 self._game_state = GameState.GAME_OVER
-            elif self._actor.collides_with_head(self.__food.get_rect()):
+            elif self._actor.collides([self._food.get_rect()]):
                 self._set_food()
                 self.grow.execute(self._actor)
         self.draw()
