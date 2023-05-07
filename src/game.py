@@ -1,31 +1,24 @@
-from typing import Union
-
 import pygame
 from pygame import Rect
-from pygame.surface import Surface, SurfaceType
 
-from food import Food
+from src.commands.command import Command
+from src.commands.grow import GrowCommand
+from src.commands.move_commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
+from src.elements.actor.snake_actor import Snake
+from src.elements.food import Food
 from src.elements.game_field import GameField
 from src.ui import message
 from src.ui.buttons.button.image_button import ImageButton
 from src.ui.buttons.button.text_button import TextButton
+from src.ui.message import MessageDisplayer
 from src.utils.color import Color
 from src.utils.game_state import GameState
 from src.utils.globals import BUTTON_WIDTH, BUTTON_HEIGHT
-from src.elements.actor.snake_actor import Snake
-from src.commands.command import Command
-from src.commands.grow import GrowCommand
-from src.commands.move_commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
-from src.ui.message import MessageDisplayer
 
 START_BUTTON_IMAGE = pygame.image.load("StartButton.png")
 
 
 class Game:
-    _screen: Union[Surface, SurfaceType]
-    _actor: Snake
-    _field: GameField
-    grow: GrowCommand
 
     def __init__(self, width: int, height: int):
         """
@@ -98,7 +91,7 @@ class Game:
         self._screen.fill(Color.WHITE.value)
         self._field.draw(self._screen)
         self._actor.draw(self._screen)
-        pygame.draw.rect(self._screen, Color.BLACK.value, self._food.get_rect())
+        self._food.draw(self._screen)
         pygame.draw.rect(self._screen, Color.DARK_GRAY.value, self._food.get_rect(), 2, 1)
 
     def run(self):
