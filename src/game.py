@@ -198,9 +198,9 @@ class Game:
             elif self._actor.collides_with_itself():
                 self._game_state = GameState.GAME_OVER
             elif self._actor.collides([self._food.get_rect()]):
-                self._set_food()
                 self.grow.execute(self._actor)
                 self._score += 1
+                self._set_food()
         self.draw()
 
     def _pausing(self) -> None:
