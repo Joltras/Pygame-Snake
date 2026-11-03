@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pygame
 from pygame import Rect
 
@@ -15,7 +17,7 @@ from src.utils.color import Color
 from src.utils.game_state import GameState
 from src.utils.globals import BUTTON_WIDTH, BUTTON_HEIGHT
 
-START_BUTTON_IMAGE = pygame.image.load("StartButton.png")
+START_BUTTON_IMAGE = pygame.image.load(Path(__file__).parent / "StartButton.png")
 
 
 class Game:
