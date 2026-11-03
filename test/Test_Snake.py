@@ -1,9 +1,9 @@
 import unittest
 from collections import deque
 
-from actor.Snake_Actor import Snake
+from src.elements.actor.snake_actor import Snake
 from pygame import Rect
-from Globals import SQUARE_SIZE
+from src.utils.globals import SQUARE_SIZE
 
 
 class MyTestCase(unittest.TestCase):
