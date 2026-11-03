@@ -80,11 +80,11 @@ class MyTestCase(unittest.TestCase):
 
     def test_collides_with_body_true(self):
         rect = Rect(10 * SQUARE_SIZE, 20 * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
-        self.assertTrue(self.__snake_1.collides_with_body(rect))
+        self.assertTrue(self.__snake_1.collides([rect]))
 
     def test_collides_with_body_false(self):
         rect = Rect(0, 0, SQUARE_SIZE, SQUARE_SIZE)
-        self.assertFalse(self.__snake_3.collides_with_body(rect))
+        self.assertFalse(self.__snake_3.collides([rect]))
 
     def test_collides_with_itself_true(self):
         self.__snake_3.move_down()
@@ -96,11 +96,11 @@ class MyTestCase(unittest.TestCase):
 
     def test_collision_with_head_true(self):
         rect = Rect(300, 540, SQUARE_SIZE, SQUARE_SIZE)
-        self.assertTrue(self.__snake_3.collides_with_head(rect))
+        self.assertTrue(self.__snake_3.get_head().colliderect(rect))
 
     def test_collision_with_head_false(self):
         rect = Rect(300, 510, SQUARE_SIZE, SQUARE_SIZE)
-        self.assertFalse(self.__snake_3.collides_with_head(rect))
+        self.assertFalse(self.__snake_3.get_head().colliderect(rect))
 
 if __name__ == '__main__':
     unittest.main()

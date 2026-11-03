@@ -30,5 +30,5 @@ python -m src.main
 ## Tests
 
 ```bash
-python -m unittest test.Test_Snake
+python -m unittest
 ```
