@@ -26,8 +26,11 @@ class GameField(GameElement):
         self._left = left
         self._top = top
 
-        self._elements: List[GameElement] = [PlayingArea(width=self._width, height=self._height),
-                                             GameBorder(width_in_squares=self._width_in_squares, height_in_squares=self._height_in_squares)]
+        self._elements: List[GameElement] = [PlayingArea(width=self._width, height=self._height,
+                                                         left=self._left, top=self._top),
+                                             GameBorder(width_in_squares=self._width_in_squares,
+                                                        height_in_squares=self._height_in_squares,
+                                                        left=self._left, top=self._top)]
 
         # Create the border of the field
     def get_top(self) -> int:
