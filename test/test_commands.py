@@ -45,6 +45,18 @@ class CommandsTest(unittest.TestCase):
         MoveRightCommand().execute(self.__actor)
         self.assertEqual(["right"], self.__actor.calls)
 
+    def test_is_opposite_true(self):
+        self.assertTrue(MoveUpCommand().is_opposite(MoveDownCommand()))
+        self.assertTrue(MoveLeftCommand().is_opposite(MoveRightCommand()))
+
+    def test_is_opposite_false(self):
+        self.assertFalse(MoveUpCommand().is_opposite(MoveLeftCommand()))
+        self.assertFalse(MoveUpCommand().is_opposite(MoveUpCommand()))
+
+    def test_is_opposite_no_move_command(self):
+        self.assertFalse(MoveUpCommand().is_opposite(None))
+        self.assertFalse(MoveUpCommand().is_opposite(GrowCommand()))
+
     def test_grow(self):
         GrowCommand().execute(self.__actor)
         self.assertEqual(["grow"], self.__actor.calls)
