@@ -32,22 +32,22 @@ class Game:
 
         self._field: GameField = GameField(width=width, height=height)
 
-        self._actor: Snake = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
-                                   self._field.get_top(), self._field.get_left())
+        self._actor: Snake
+        self._food: Food
+        self._command: MoveCommand
+        self._reset()
+
         self._screen = pygame.display.set_mode((width, height))
         self._clock = pygame.time.Clock()
 
         self._message_displayer: MessageDisplayer = MessageDisplayer(self._field.get_width(),
                                                                      self._field.get_height(), self._field.get_top(),
                                                                      self._field.get_left())
-        self._food: Food
-        self._set_food()
-        self._command: MoveCommand = None
 
         self._game_state: GameState = GameState.STARTING
         self._start_button = ImageButton(START_BUTTON_IMAGE, self.set_running)
         self._exit_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Exit", self.set_closing, Color.ORANGE)
-        self._restart_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Restart", self.set_starting)
+        self._restart_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Restart", self.restart)
         self._continue_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Continue", self.set_running)
 
         self.move_up = MoveUpCommand()
@@ -73,6 +73,22 @@ class Game:
          Sets the current game state to starting.
         """
         self._game_state = GameState.STARTING
+
+    def restart(self) -> None:
+        """
+        Resets the game and shows the starting message.
+        """
+        self._reset()
+        self.set_starting()
+
+    def _reset(self) -> None:
+        """
+        Places a new snake and new food on the field and removes the current direction.
+        """
+        self._actor = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
+                            self._field.get_top(), self._field.get_left())
+        self._set_food()
+        self._command = None
 
     def _set_food(self) -> None:
         """
@@ -204,17 +220,12 @@ class Game:
                 self._game_state = GameState.CLOSE_GAME
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
-                    self._actor = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
-                                        self._field.get_top(), self._field.get_left())
-                    self._game_state = GameState.STARTING
+                    self.restart()
                 elif event.key == pygame.K_n:
                     self._game_state = GameState.CLOSE_GAME
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self._exit_button.has_been_clicked(event.pos[0], event.pos[1])
                 self._restart_button.has_been_clicked(event.pos[0], event.pos[1])
-                if self._game_state.value == 0:
-                    self._actor = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
-                                        self._field.get_top(), self._field.get_left())
 
     def handle_input(self, event) -> MoveCommand:
         """
