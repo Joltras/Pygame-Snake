@@ -3,7 +3,6 @@ from pathlib import Path
 import pygame
 from pygame import Rect
 
-from src.commands.command import Command
 from src.commands.grow import GrowCommand
 from src.commands.move_commands import MoveCommand, MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
 from src.elements.actor.snake_actor import Snake
@@ -33,21 +32,22 @@ class Game:
 
         self._field: GameField = GameField(width=width, height=height)
 
-        self._actor: Snake = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
-                                   self._field.get_top(), self._field.get_left())
+        self._actor: Snake
+        self._food: Food
+        self._command: MoveCommand
+        self._reset()
+
         self._screen = pygame.display.set_mode((width, height))
         self._clock = pygame.time.Clock()
 
         self._message_displayer: MessageDisplayer = MessageDisplayer(self._field.get_width(),
                                                                      self._field.get_height(), self._field.get_top(),
                                                                      self._field.get_left())
-        self._food: Food
-        self._set_food()
 
         self._game_state: GameState = GameState.STARTING
         self._start_button = ImageButton(START_BUTTON_IMAGE, self.set_running)
         self._exit_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Exit", self.set_closing, Color.ORANGE)
-        self._restart_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Restart", self.set_starting)
+        self._restart_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Restart", self.restart)
         self._continue_button = TextButton(Rect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT), "Continue", self.set_running)
 
         self.move_up = MoveUpCommand()
@@ -73,6 +73,22 @@ class Game:
          Sets the current game state to starting.
         """
         self._game_state = GameState.STARTING
+
+    def restart(self) -> None:
+        """
+        Resets the game and shows the starting message.
+        """
+        self._reset()
+        self.set_starting()
+
+    def _reset(self) -> None:
+        """
+        Places a new snake and new food on the field and removes the current direction.
+        """
+        self._actor = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
+                            self._field.get_top(), self._field.get_left())
+        self._set_food()
+        self._command = None
 
     def _set_food(self) -> None:
         """
@@ -101,7 +117,6 @@ class Game:
         Reacts to the input.
         """
         active: bool
-        command: Command = None
 
         active = True
         while active:
@@ -112,7 +127,7 @@ class Game:
 
             elif self._game_state.value == 1:
                 # Running
-                command = self._running(command)
+                self._running()
 
             elif self._game_state.value == 2:
                 # Winning
@@ -149,27 +164,25 @@ class Game:
                 self._start_button.has_been_clicked(event.pos[0], event.pos[1])
                 self._exit_button.has_been_clicked(event.pos[0], event.pos[1])
 
-    def _running(self, command: Command) -> Command:
+    def _running(self) -> None:
         """
         Reacts to the inputs while in game state running.
-        :param command: current command
-        :return: new command if changed otherwise the given command
         """
         # Command that has been executed last, the snake must not turn back into it
-        last_command: Command = command
+        last_command: MoveCommand = self._command
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._game_state = GameState.CLOSE_GAME
-                return command
+                return
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self._game_state = GameState.PAUSED
-                    return command
+                    return
                 n_command = self.handle_input(event)
                 if n_command is not None and not n_command.is_opposite(last_command):
-                    command = n_command
-        if command is not None:
-            command.execute(self._actor)
+                    self._command = n_command
+        if self._command is not None:
+            self._command.execute(self._actor)
             if self._field.collides(self._actor.get_segments()):
                 self._game_state = GameState.GAME_OVER
             elif self._actor.collides_with_itself():
@@ -178,7 +191,6 @@ class Game:
                 self._set_food()
                 self.grow.execute(self._actor)
         self.draw()
-        return command
 
     def _pausing(self) -> None:
         """
@@ -208,17 +220,12 @@ class Game:
                 self._game_state = GameState.CLOSE_GAME
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
-                    self._actor = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
-                                        self._field.get_top(), self._field.get_left())
-                    self._game_state = GameState.STARTING
+                    self.restart()
                 elif event.key == pygame.K_n:
                     self._game_state = GameState.CLOSE_GAME
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self._exit_button.has_been_clicked(event.pos[0], event.pos[1])
                 self._restart_button.has_been_clicked(event.pos[0], event.pos[1])
-                if self._game_state.value == 0:
-                    self._actor = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
-                                        self._field.get_top(), self._field.get_left())
 
     def handle_input(self, event) -> MoveCommand:
         """
