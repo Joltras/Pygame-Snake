@@ -140,7 +140,7 @@ class Game:
 
             elif self._game_state.value == 2:
                 # Winning
-                print("WON!")
+                self._winning()
 
             elif self._game_state.value == 3:
                 # Losing
@@ -200,7 +200,9 @@ class Game:
             elif self._actor.collides([self._food.get_rect()]):
                 self.grow.execute(self._actor)
                 self._score += 1
-                self._set_food()
+                if not self._set_food():
+                    # The snake covers the whole field
+                    self._game_state = GameState.WON
         self.draw()
 
     def _pausing(self) -> None:
@@ -219,11 +221,24 @@ class Game:
                 self._exit_button.has_been_clicked(event.pos[0], event.pos[1])
                 self._continue_button.has_been_clicked(event.pos[0], event.pos[1])
 
+    def _winning(self) -> None:
+        """
+         Displays the winning message and reacts to input.
+        """
+        self._end_game(message.WIN_TITLE)
+
     def _losing(self) -> None:
         """
          Displays the losing message and reacts to input.
         """
-        self._message_displayer.create_message(self._field, message.GAME_OVER_TITLE, self._screen,
+        self._end_game(message.GAME_OVER_TITLE)
+
+    def _end_game(self, title: str) -> None:
+        """
+        Displays the given title with the restart and exit button and reacts to input.
+        :param title: Title of the message
+        """
+        self._message_displayer.create_message(self._field, title, self._screen,
                                                self._restart_button,
                                                self._exit_button)
         for event in pygame.event.get():
