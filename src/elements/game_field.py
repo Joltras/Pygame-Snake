@@ -4,7 +4,7 @@ from src.elements.game_border import GameBorder
 from src.elements.game_element import GameElement
 from src.elements.playing_area import PlayingArea
 from src.utils.globals import SQUARE_SIZE
-from typing import List
+from typing import List, Tuple
 
 
 class GameField(GameElement):
@@ -91,6 +91,13 @@ class GameField(GameElement):
         """
         cord = random.randint(1, (self._height_in_squares - 2))
         return cord
+
+    def get_inner_squares(self) -> List[Tuple[int, int]]:
+        """
+        Returns the coordinates of all squares inside the border.
+        :return: list of (x, y) coordinates
+        """
+        return [(x, y) for x in range(1, self._width_in_squares - 1) for y in range(1, self._height_in_squares - 1)]
 
     @override
     def draw(self, screen) -> None:

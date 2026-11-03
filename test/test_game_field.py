@@ -31,6 +31,14 @@ class GameFieldTest(unittest.TestCase):
         self.assertTrue(field.collides([Rect(300, 60, SQUARE_SIZE, SQUARE_SIZE)]))
         self.assertFalse(field.collides([Rect(0, 0, SQUARE_SIZE, SQUARE_SIZE)]))
 
+    def test_inner_squares(self):
+        squares = self.__field.get_inner_squares()
+        self.assertEqual((WIDTH_IN_SQUARES - 2) * (HEIGHT_IN_SQUARES - 2), len(squares))
+        for x, y in squares:
+            with self.subTest(x=x, y=y):
+                self.assertIn(x, range(1, WIDTH_IN_SQUARES - 1))
+                self.assertIn(y, range(1, HEIGHT_IN_SQUARES - 1))
+
     def test_random_x_not_on_border(self):
         for _ in range(200):
             self.assertIn(self.__field.random_x_on_field(), range(1, WIDTH_IN_SQUARES - 1))

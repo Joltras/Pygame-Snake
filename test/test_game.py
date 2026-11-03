@@ -169,3 +169,92 @@ class GameScoreTest(unittest.TestCase):
             self.__game.restart()
             self.assertGreaterEqual(self.__game._actor.get_head().top, bar_height)
             self.assertGreaterEqual(self.__game._food.get_rect().top, bar_height)
+
+
+class GameWinTest(unittest.TestCase):
+    """
+    Uses a field with only three free squares: (1, 1), (2, 1) and (3, 1).
+    """
+
+    def setUp(self) -> None:
+        pygame.init()
+        self.__game = Game(5 * SQUARE_SIZE, 3 * SQUARE_SIZE + 2 * SQUARE_SIZE)
+        pygame.event.clear()
+        self.__top = self.__game._field.get_top()
+        # Snake on (2, 1) and (1, 1) moving right
+        snake = Snake(1, 1, self.__top, 0)
+        snake.move_right()
+        snake.grow()
+        self.__game._actor = snake
+        self.__game._command = self.__game.move_right
+        self.__game.set_running()
+
+    def tearDown(self) -> None:
+        pygame.quit()
+
+    def test_field_has_three_free_squares(self):
+        self.assertEqual(3, len(self.__game._field.get_inner_squares()))
+
+    def test_food_on_last_free_square(self):
+        self.assertTrue(self.__game._set_food())
+        self.assertEqual(Rect(3 * SQUARE_SIZE, SQUARE_SIZE + self.__top, SQUARE_SIZE, SQUARE_SIZE),
+                         self.__game._food.get_rect())
+
+    def test_no_food_when_field_is_full(self):
+        self.__game._actor.move_right()
+        self.__game._actor.grow()
+        self.assertFalse(self.__game._set_food())
+
+    def test_win_when_field_is_full(self):
+        self.__game._set_food()
+        self.__game._running()
+        self.assertEqual(GameState.WON, self.__game._game_state)
+        self.assertEqual(3, self.__game._actor.get_length())
+
+    def test_restart_after_win(self):
+        self.__game._set_food()
+        self.__game._running()
+        press(pygame.K_y)
+        self.__game._winning()
+        self.assertEqual(GameState.STARTING, self.__game._game_state)
+        self.assertEqual(1, self.__game._actor.get_length())
+
+    def test_exit_after_win(self):
+        self.__game._game_state = GameState.WON
+        press(pygame.K_n)
+        self.__game._winning()
+        self.assertEqual(GameState.CLOSE_GAME, self.__game._game_state)
+
+
+class GameFoodTest(unittest.TestCase):
+    def setUp(self) -> None:
+        pygame.init()
+        self.__game = Game(1280, 720)
+
+    def tearDown(self) -> None:
+        pygame.quit()
+
+    def test_food_never_on_snake(self):
+        top = self.__game._field.get_top()
+        snake = Snake(1, 1, top, 0)
+        for _ in range(30):
+            snake.move_right()
+            snake.grow()
+        self.__game._actor = snake
+        for _ in range(200):
+            self.__game._set_food()
+            self.assertFalse(snake.collides([self.__game._food.get_rect()]))
+
+    def test_food_not_on_new_tail(self):
+        # Snake on (2, 1) and (1, 1) moving right, food directly in front of it
+        top = self.__game._field.get_top()
+        snake = Snake(1, 1, top, 0)
+        snake.move_right()
+        snake.grow()
+        self.__game._actor = snake
+        self.__game._food = Food(3, 1, top, 0)
+        self.__game._command = self.__game.move_right
+        self.__game.set_running()
+        self.__game._running()
+        self.assertEqual(3, snake.get_length())
+        self.assertFalse(snake.collides([self.__game._food.get_rect()]))
