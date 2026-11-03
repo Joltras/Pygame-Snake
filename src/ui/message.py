@@ -22,6 +22,9 @@ WIN_TITLE: str = "WON"
 
 PAUSED_TITLE: str = "Paused"
 
+BUTTON_GAP: int = 40
+BUTTON_MARGIN: int = 60
+
 
 class MessageDisplayer:
     """
@@ -48,14 +51,20 @@ class MessageDisplayer:
         :param field: GameField
         :param text: Message text
         :param screen: Screen
+        :param button1: Left button
+        :param button2: Right button
         """
         pygame.draw.rect(screen, BACKGROUND_COLOR, self.__background)
-        y_pos: int = field.get_height() // 2
-        x_pos: int = field.get_height() // 2
+        center_x: int = field.get_width() // 2 + self.__left
+        center_y: int = field.get_height() // 2 + self.__top + BUTTON_MARGIN
 
         self.create_title_message(field, text, screen)
-        button1.draw(screen, x_pos - button1.get_width() + self.__left, y_pos + button1.get_height() + self.__top)
-        button2.draw(screen, x_pos + button2.get_width() + self.__left, y_pos + button2.get_height() + self.__top)
+
+        # Center both buttons as one row with a gap between them
+        row_width: int = button1.get_width() + BUTTON_GAP + button2.get_width()
+        x_pos: int = center_x - row_width // 2
+        button1.draw(screen, x_pos, center_y - button1.get_height() // 2)
+        button2.draw(screen, x_pos + button1.get_width() + BUTTON_GAP, center_y - button2.get_height() // 2)
 
     def create_title_message(self, field: GameField, text: str, screen):
         """
