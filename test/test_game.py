@@ -36,14 +36,14 @@ class GameDirectionTest(unittest.TestCase):
             snake.grow()
         snake.move_right()
         self.__game._actor = snake
-        self.__command = self.__game.move_right
+        self.__game._command = self.__game.move_right
         self.__game.set_running()
 
     def tearDown(self) -> None:
         pygame.quit()
 
     def __tick(self) -> None:
-        self.__command = self.__game._running(self.__command)
+        self.__game._running()
 
     def test_reverse_is_ignored(self):
         press(pygame.K_LEFT)
