@@ -1,6 +1,6 @@
 # Pygame Snake
 
-Ein Snake-Spiel, geschrieben in Python mit [pygame](https://www.pygame.org/).
+Ein Snake-Spiel, geschrieben in Python mit [pygame-ce](https://pyga.me/).
 
 ## Installation
 
