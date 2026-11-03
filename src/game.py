@@ -5,7 +5,7 @@ from pygame import Rect
 
 from src.commands.command import Command
 from src.commands.grow import GrowCommand
-from src.commands.move_commands import MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
+from src.commands.move_commands import MoveCommand, MoveUpCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand
 from src.elements.actor.snake_actor import Snake
 from src.elements.food import Food
 from src.elements.game_field import GameField
@@ -155,6 +155,8 @@ class Game:
         :param command: current command
         :return: new command if changed otherwise the given command
         """
+        # Command that has been executed last, the snake must not turn back into it
+        last_command: Command = command
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._game_state = GameState.CLOSE_GAME
@@ -164,7 +166,7 @@ class Game:
                     self._game_state = GameState.PAUSED
                     return command
                 n_command = self.handle_input(event)
-                if n_command is not None:
+                if n_command is not None and not n_command.is_opposite(last_command):
                     command = n_command
         if command is not None:
             command.execute(self._actor)
@@ -218,13 +220,13 @@ class Game:
                     self._actor = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
                                         self._field.get_top(), self._field.get_left())
 
-    def handle_input(self, event) -> Command:
+    def handle_input(self, event) -> MoveCommand:
         """
         Checks the event and returns the corresponding command.
         :param event: event
         :return: command
         """
-        command: Command = None
+        command: MoveCommand = None
         if event.key == pygame.K_DOWN:
             command = self.move_down
         elif event.key == pygame.K_UP:
