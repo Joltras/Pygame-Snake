@@ -12,6 +12,7 @@ from src.ui import message
 from src.ui.buttons.button.image_button import ImageButton
 from src.ui.buttons.button.text_button import TextButton
 from src.ui.message import MessageDisplayer
+from src.ui.score_bar import ScoreBar
 from src.utils.color import Color
 from src.utils.game_state import GameState
 from src.utils.globals import BUTTON_WIDTH, BUTTON_HEIGHT
@@ -30,11 +31,14 @@ class Game:
 
         placed_food: bool
 
-        self._field: GameField = GameField(width=width, height=height)
+        self._score_bar: ScoreBar = ScoreBar(width)
+        self._field: GameField = GameField(width=width, height=height - self._score_bar.get_height(),
+                                           top=self._score_bar.get_height())
 
         self._actor: Snake
         self._food: Food
         self._command: MoveCommand
+        self._score: int
         self._reset()
 
         self._screen = pygame.display.set_mode((width, height))
@@ -83,12 +87,13 @@ class Game:
 
     def _reset(self) -> None:
         """
-        Places a new snake and new food on the field and removes the current direction.
+        Places a new snake and new food on the field, removes the current direction and resets the score.
         """
         self._actor = Snake(self._field.random_x_on_field(), self._field.random_y_on_field(),
                             self._field.get_top(), self._field.get_left())
         self._set_food()
         self._command = None
+        self._score = 0
 
     def _set_food(self) -> None:
         """
@@ -144,6 +149,7 @@ class Game:
                 # Pausing
                 self._pausing()
 
+            self._score_bar.draw(self._screen, self._score)
             pygame.display.flip()
             self._clock.tick(5)
 
@@ -190,6 +196,7 @@ class Game:
             elif self._actor.collides([self._food.get_rect()]):
                 self._set_food()
                 self.grow.execute(self._actor)
+                self._score += 1
         self.draw()
 
     def _pausing(self) -> None:
