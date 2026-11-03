@@ -1,3 +1,4 @@
+import random
 from pathlib import Path
 
 import pygame
@@ -95,17 +96,20 @@ class Game:
         self._command = None
         self._score = 0
 
-    def _set_food(self) -> None:
+    def _set_food(self) -> bool:
         """
-        Placed a new food object on the field
+        Places a new food object on a random square that is not covered by the snake.
+        :return: True if the food has been placed, False if there is no free square left
         """
-        placed_food = False
-        while not placed_food:
-            x = self._field.random_x_on_field()
-            y = self._field.random_y_on_field()
-            self._food = Food(x, y, self._field.get_top(), self._field.get_left())
-            if not self._actor.collides([self._food.get_rect()]):
-                placed_food = True
+        free_squares = []
+        for x, y in self._field.get_inner_squares():
+            food = Food(x, y, self._field.get_top(), self._field.get_left())
+            if not self._actor.collides([food.get_rect()]):
+                free_squares.append(food)
+        if not free_squares:
+            return False
+        self._food = random.choice(free_squares)
+        return True
 
     def draw(self):
         """
