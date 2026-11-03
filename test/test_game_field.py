@@ -26,6 +26,11 @@ class GameFieldTest(unittest.TestCase):
         rect = Rect(SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
         self.assertFalse(self.__field.collides([rect]))
 
+    def test_collides_with_border_offset(self):
+        field = GameField(WIDTH_IN_SQUARES * SQUARE_SIZE, HEIGHT_IN_SQUARES * SQUARE_SIZE, left=300, top=60)
+        self.assertTrue(field.collides([Rect(300, 60, SQUARE_SIZE, SQUARE_SIZE)]))
+        self.assertFalse(field.collides([Rect(0, 0, SQUARE_SIZE, SQUARE_SIZE)]))
+
     def test_random_x_not_on_border(self):
         for _ in range(200):
             self.assertIn(self.__field.random_x_on_field(), range(1, WIDTH_IN_SQUARES - 1))
