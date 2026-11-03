@@ -72,3 +72,57 @@ class GameDirectionTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class GameRestartTest(unittest.TestCase):
+    def setUp(self) -> None:
+        pygame.init()
+        self.__game = Game(1280, 720)
+        pygame.event.clear()
+        # Long snake moving right that has just lost
+        snake = Snake(4, 5, 0, 0)
+        for _ in range(3):
+            snake.move_right()
+            snake.grow()
+        self.__game._actor = snake
+        self.__game._food = Food(1, 1, 0, 0)
+        self.__game._command = self.__game.move_right
+        self.__game._game_state = GameState.GAME_OVER
+
+    def tearDown(self) -> None:
+        pygame.quit()
+
+    def __assert_reset(self) -> None:
+        self.assertEqual(GameState.STARTING, self.__game._game_state)
+        self.assertIsNone(self.__game._command)
+        self.assertEqual(1, self.__game._actor.get_length())
+        self.assertFalse(self.__game._actor.collides([self.__game._food.get_rect()]))
+
+    def test_restart(self):
+        self.__game.restart()
+        self.__assert_reset()
+
+    def test_restart_with_key(self):
+        press(pygame.K_y)
+        self.__game._losing()
+        self.__assert_reset()
+
+    def test_restart_with_button(self):
+        # Draw the message once so the button knows its position
+        self.__game._losing()
+        position = self.__game._restart_button._rect.center
+        pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, pos=position, button=1))
+        self.__game._losing()
+        self.__assert_reset()
+
+    def test_restart_does_not_keep_moving(self):
+        self.__game.restart()
+        self.__game.set_running()
+        head = self.__game._actor.get_head().copy()
+        self.__game._running()
+        self.assertEqual(head, self.__game._actor.get_head())
+
+    def test_exit_with_key(self):
+        press(pygame.K_n)
+        self.__game._losing()
+        self.assertEqual(GameState.CLOSE_GAME, self.__game._game_state)
